@@ -10,6 +10,8 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "esbuild": "^0.19.4",
+    "firebase": "^10.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
