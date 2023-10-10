@@ -37,14 +37,18 @@ const App = () => {
   return(
     <>
       <h1>{schedule.title}</h1>
+      <div className = "courses-grid">
       {Object.keys(schedule.courses).map(key => (
         <>
-        <div key={key}>
-        {schedule.courses[key].term} CS {schedule.courses[key].number}
-        {schedule.courses[key].title}
-        {schedule.courses[key].meets}</div>
+        <div className="card m-1 p-2" key={key}>
+        <h5 className="card-title" >{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
+        <div className="card-text">{schedule.courses[key].title} </div>
+        <div className="card-text">{schedule.courses[key].meets}</div> 
+        </div>
         </>
+        
       ))}
+      </div>
 
 
     </>

@@ -28,6 +28,20 @@
   color: #61dafb;
 }
 
+.courses-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 14rem);
+
+}
+
+.card {
+  
+  border: 1px solid;
+  width: 210px;
+  padding: 5px;
+  margin: 10px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
