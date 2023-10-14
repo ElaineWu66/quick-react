@@ -54,3 +54,8 @@
 button {
   font-size: calc(10px + 2vmin);
 }
+
+.term-selector button.active {
+  background-color: #007BFF;
+  color: white;
+}
