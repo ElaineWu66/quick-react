@@ -62,7 +62,15 @@ const App = () => {
   );
   
   const [selectedTerm, setSelectedTerm] = useState("Fall");
+  const [selectedCourses, setSelectedCourses] = useState([]);
 
+  const toggleCourseSelection = (key) => {
+    if (selectedCourses.includes(key)) {
+      setSelectedCourses(selectedCourses.filter(courseKey => courseKey !== key));
+    } else {
+      setSelectedCourses([...selectedCourses, key]);
+    }
+  };
 
   if (error) return <h1>Error loading Schedule data: {`${error}`}</h1>;
   if (isLoading) return <h1>Loading Schedule data...</h1>;
@@ -81,7 +89,11 @@ const App = () => {
       .filter(key => schedule.courses[key].term === selectedTerm)
       .map(key => (
         <>
-        <div className="card m-1 p-2" key={key}>
+        <div 
+          className={`card m-1 p-2 ${selectedCourses.includes(key) ? 'selected-course' : ''}`} 
+          key={key}
+          onClick={() => toggleCourseSelection(key)}
+        >
         <h5 className="card-title" >{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
         <div className="card-text">{schedule.courses[key].title} </div>
         <div className="card-text">{schedule.courses[key].meets}</div> 

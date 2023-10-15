@@ -56,6 +56,13 @@ button {
 }
 
 .term-selector button.active {
-  background-color: #007BFF;
+  background-color: #4E2A84;
   color: white;
+}
+
+
+.selected-course {
+  background-color: #4E2A84; 
+  border: 2px solid #f0f0f0; 
+  color: #FFFFFF;
 }
