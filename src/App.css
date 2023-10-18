@@ -66,3 +66,27 @@ button {
   border: 2px solid #f0f0f0; 
   color: #FFFFFF;
 }
+
+.float-right {
+  float: right;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #FFFFFF;
+  padding: 20px;
+  border-radius: 5px;
+  width: 70%;
+  max-width: 500px;
+}

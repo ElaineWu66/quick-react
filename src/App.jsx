@@ -54,6 +54,25 @@ const TermSelector = ({ selectedTerm, setSelectedTerm }) => {
   );
 };
 
+const Modal = ({ selectedCourses, courses, onClose }) => (
+  <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-content" onClick={e => e.stopPropagation()}>
+      {selectedCourses.length === 0 ? (
+        <p>No courses selected. Click on a course to select it.</p>
+      ) : (
+        selectedCourses.map(key => (
+          <div key={key}>
+            CS {courses[key].number}: {courses[key].title} - {courses[key].meets}
+          </div>
+        ))
+      )}
+      <button onClick={onClose}>Close</button>
+    </div>
+  </div>
+);
+
+
+
 
 
 const App = () => {
@@ -63,6 +82,7 @@ const App = () => {
   
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [showModal, setShowModal] = useState(false); 
 
   const toggleCourseSelection = (key) => {
     if (selectedCourses.includes(key)) {
@@ -81,10 +101,16 @@ const App = () => {
   return(
     <>
       <h1>{schedule.title}</h1>
-      <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+
+      <div className="header">
+        <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+        <button className="float-right" onClick={() => setShowModal(true)}>Course Plan</button>
+      </div>
+
+      {showModal && <Modal selectedCourses={selectedCourses} courses={schedule.courses} onClose={() => setShowModal(false)} />}
+
 
       <div className = "courses-grid">
-
       {Object.keys(schedule.courses)
       .filter(key => schedule.courses[key].term === selectedTerm)
       .map(key => (
