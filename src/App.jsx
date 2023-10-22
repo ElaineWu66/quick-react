@@ -5,6 +5,7 @@ import './App.css';
 import { useJsonQuery } from "./utilities/fetch";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { doCoursesConflict } from "./utilities/courseUtilities";
+import { validateTitle, validateMeets } from "./utilities/validation";
 
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
@@ -108,9 +109,24 @@ const App = () => {
     const [title, setTitle] = useState(course.title);
     const [meets, setMeets] = useState(course.meets);
   
+    const [errors, setErrors] = useState({});
+
     const onSubmit = (e) => {
       e.preventDefault();
-      // For now, do nothing
+      setErrors({});
+
+      const titleError = validateTitle(title);
+      const meetsError = validateMeets(meets);
+  
+      if (titleError || meetsError) {
+        setErrors({
+          title: titleError,
+          meets: meetsError
+        });
+        return;
+      }
+
+
     };
   
     return (
@@ -118,10 +134,13 @@ const App = () => {
         <div>
           <label>Title:</label>
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+          {errors.title && <div className="error">{errors.title}</div>}
         </div>
         <div>
           <label>Meets:</label>
           <input type="text" value={meets} onChange={(e) => setMeets(e.target.value)} />
+                  {errors.meets && <div className="error">{errors.meets}</div>}
+
         </div>
         <button type="button" onClick={onCancel}>Cancel</button>
       </form>

@@ -109,3 +109,9 @@ button {
   padding: 4px 8px;
   font-size: 12px;
 }
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
