@@ -104,3 +104,8 @@ button {
   font-size: 1.5em;
   color: #4E2A84;
 }
+
+.edit-button {
+  padding: 4px 8px;
+  font-size: 12px;
+}

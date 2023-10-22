@@ -85,6 +85,11 @@ const App = () => {
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [showModal, setShowModal] = useState(false); 
 
+  const [editMode, setEditMode] = useState(false); 
+  const [currentCourseKey, setCurrentCourseKey] = useState(null);
+
+
+
 
   const isCourseConflicting = (courseKey) => {
     const course = schedule.courses[courseKey];
@@ -99,48 +104,102 @@ const App = () => {
     }
   };
 
+  const CourseEditForm = ({ course, onCancel }) => {
+    const [title, setTitle] = useState(course.title);
+    const [meets, setMeets] = useState(course.meets);
+  
+    const onSubmit = (e) => {
+      e.preventDefault();
+      // For now, do nothing
+    };
+  
+    return (
+      <form onSubmit={onSubmit}>
+        <div>
+          <label>Title:</label>
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </div>
+        <div>
+          <label>Meets:</label>
+          <input type="text" value={meets} onChange={(e) => setMeets(e.target.value)} />
+        </div>
+        <button type="button" onClick={onCancel}>Cancel</button>
+      </form>
+    );
+  };
+
+
+
   if (error) return <h1>Error loading Schedule data: {`${error}`}</h1>;
   if (isLoading) return <h1>Loading Schedule data...</h1>;
   if (!data) return <h1>No Schedule data found</h1>;
   
   // console.log(data)
   const schedule = data;
-  return(
+
+
+
+  
+  return (
     <>
       <h1>{schedule.title}</h1>
-
-      <div className="header">
-        <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
-        <button className="float-right" onClick={() => setShowModal(true)}>Course Plan</button>
-      </div>
-
-      {showModal && <Modal selectedCourses={selectedCourses} courses={schedule.courses} onClose={() => setShowModal(false)} />}
-
-
-      <div className = "courses-grid">
-      {Object.keys(schedule.courses)
-      .filter(key => schedule.courses[key].term === selectedTerm)
-      .map(key => {
-        const isSelected = selectedCourses.includes(key);
-        const isConflicting = !isSelected && isCourseConflicting(key);
-        return(
-        <>
-        <div 
-          className={`card m-1 p-2 ${isSelected ? 'selected-course' : ''} ${isConflicting ? 'conflicting-course' : ''}`} 
-          key={key}
-          onClick={() => toggleCourseSelection(key)}
-        >
-        <h5 className="card-title" >{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
-        <div className="card-text">{schedule.courses[key].title} </div>
-        <div className="card-text">{schedule.courses[key].meets}</div> 
+      {editMode ? (
+        <CourseEditForm 
+          course={schedule.courses[currentCourseKey]} 
+          onCancel={() => {
+            setEditMode(false);
+            setCurrentCourseKey(null);
+          }} 
+        />
+      ) : (
+        <div> 
+          <div className="header">
+            <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+            <button className="float-right" onClick={() => setShowModal(true)}>Course Plan</button>
+          </div>
+  
+          {showModal && <Modal selectedCourses={selectedCourses} courses={schedule.courses} onClose={() => setShowModal(false)} />}
+  
+          <div className="courses-grid">
+            {Object.keys(schedule.courses)
+              .filter(key => schedule.courses[key].term === selectedTerm)
+              .map(key => {
+                const isSelected = selectedCourses.includes(key);
+                const isConflicting = !isSelected && isCourseConflicting(key);
+                return (
+                  <div 
+                    className={`card m-1 p-2 ${isSelected ? 'selected-course' : ''} ${isConflicting ? 'conflicting-course' : ''}`} 
+                    key={key}
+                    onClick={() => toggleCourseSelection(key)}
+                  >
+                    <h5 className="card-title">{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
+                    <div className="card-text">{schedule.courses[key].title}</div>
+                    <div className="card-text">{schedule.courses[key].meets}</div>
+                    <button 
+                      className="edit-button" 
+                      onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentCourseKey(key);
+                      setEditMode(true);
+                    }}>
+                      Edit
+                    </button>
+                  </div>
+                )
+              })}
+          </div>
         </div>
-        </>
-        
-)})}
-      </div>
+      )}
     </>
-  ) 
+  )
+  
 };
+
+
+
+
+
+
 
 const queryClient = new QueryClient();
 function AppWrapper() {
