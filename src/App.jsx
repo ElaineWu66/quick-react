@@ -4,6 +4,7 @@ import './App.css';
 
 import { useJsonQuery } from "./utilities/fetch";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { doCoursesConflict } from "./utilities/courseUtilities";
 
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
@@ -84,10 +85,16 @@ const App = () => {
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [showModal, setShowModal] = useState(false); 
 
+
+  const isCourseConflicting = (courseKey) => {
+    const course = schedule.courses[courseKey];
+    return selectedCourses.some(selectedKey => doCoursesConflict(course, schedule.courses[selectedKey]));
+  };
+
   const toggleCourseSelection = (key) => {
     if (selectedCourses.includes(key)) {
       setSelectedCourses(selectedCourses.filter(courseKey => courseKey !== key));
-    } else {
+    } else if (!isCourseConflicting(key)) {
       setSelectedCourses([...selectedCourses, key]);
     }
   };
@@ -113,10 +120,13 @@ const App = () => {
       <div className = "courses-grid">
       {Object.keys(schedule.courses)
       .filter(key => schedule.courses[key].term === selectedTerm)
-      .map(key => (
+      .map(key => {
+        const isSelected = selectedCourses.includes(key);
+        const isConflicting = !isSelected && isCourseConflicting(key);
+        return(
         <>
         <div 
-          className={`card m-1 p-2 ${selectedCourses.includes(key) ? 'selected-course' : ''}`} 
+          className={`card m-1 p-2 ${isSelected ? 'selected-course' : ''} ${isConflicting ? 'conflicting-course' : ''}`} 
           key={key}
           onClick={() => toggleCourseSelection(key)}
         >
@@ -126,7 +136,7 @@ const App = () => {
         </div>
         </>
         
-      ))}
+)})}
       </div>
     </>
   ) 

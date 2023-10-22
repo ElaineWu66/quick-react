@@ -90,3 +90,17 @@ button {
   width: 70%;
   max-width: 500px;
 }
+
+.conflicting-course {
+  opacity: 0.5; 
+  position: relative;
+}
+
+.conflicting-course::before {
+  content: "✖"; 
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1.5em;
+  color: rgb(247, 15, 15);
+}
