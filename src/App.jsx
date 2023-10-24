@@ -6,7 +6,8 @@ import { useJsonQuery } from "./utilities/fetch";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { doCoursesConflict } from "./utilities/courseUtilities";
 import { validateTitle, validateMeets } from "./utilities/validation";
-
+import React from 'react';
+import useFirebaseQuery from './hooks/useFirebaseQuery';
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
 //   "courses": {
@@ -78,9 +79,13 @@ const Modal = ({ selectedCourses, courses, onClose }) => (
 
 
 const App = () => {
-  const [data, isLoading, error] = useJsonQuery(
-    "https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php"
-  );
+  // const [data, isLoading, error] = useJsonQuery(
+  //   "https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php"
+  // );
+
+  const [data, isLoading, error] = useFirebaseQuery('/courses'); // replace with your actual path
+
+  
   
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedCourses, setSelectedCourses] = useState([]);
