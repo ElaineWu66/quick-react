@@ -83,7 +83,7 @@ const App = () => {
   //   "https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php"
   // );
 
-  const [data, isLoading, error] = useFirebaseQuery('/courses'); // replace with your actual path
+  const [data, isLoading, error] = useFirebaseQuery('/'); // replace with your actual path
 
   
   
