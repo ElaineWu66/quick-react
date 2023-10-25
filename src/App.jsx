@@ -8,6 +8,9 @@ import { doCoursesConflict } from "./utilities/courseUtilities";
 import { validateTitle, validateMeets } from "./utilities/validation";
 import React from 'react';
 import useFirebaseQuery from './hooks/useFirebaseQuery';
+import { set, ref } from 'firebase/database';
+import {db} from './utilities/firebase'; 
+
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
 //   "courses": {
@@ -83,7 +86,7 @@ const App = () => {
   //   "https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php"
   // );
 
-  const [data, isLoading, error] = useFirebaseQuery('/'); // replace with your actual path
+  const [data, isLoading, error] = useFirebaseQuery('/');
 
   
   
@@ -110,6 +113,11 @@ const App = () => {
     }
   };
 
+  const updateCourseInFirebase = (courseKey, courseData) => {
+    const courseRef = ref(db, `/courses/${courseKey}`);
+    set(courseRef, courseData);
+  };
+
   const CourseEditForm = ({ course, onCancel }) => {
     const [title, setTitle] = useState(course.title);
     const [meets, setMeets] = useState(course.meets);
@@ -130,6 +138,11 @@ const App = () => {
         });
         return;
       }
+      if (title !== course.title || meets !== course.meets) {
+        updateCourseInFirebase(currentCourseKey, { ...course, title, meets });
+        setEditMode(false);
+        setCurrentCourseKey(null);
+      }
 
 
     };
@@ -148,6 +161,7 @@ const App = () => {
 
         </div>
         <button type="button" onClick={onCancel}>Cancel</button>
+        <button type="submit">Submit</button>   
       </form>
     );
   };
