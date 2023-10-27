@@ -11,6 +11,9 @@ import useFirebaseQuery from './hooks/useFirebaseQuery';
 import { set, ref } from 'firebase/database';
 import {db} from './utilities/firebase'; 
 
+import { useAuthState } from './hooks/useAuth';
+import { signInWithGoogle, firebaseSignOut } from './utilities/firebase';
+
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
 //   "courses": {
@@ -88,8 +91,6 @@ const App = () => {
 
   const [data, isLoading, error] = useFirebaseQuery('/');
 
-  
-  
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [showModal, setShowModal] = useState(false); 
@@ -97,6 +98,7 @@ const App = () => {
   const [editMode, setEditMode] = useState(false); 
   const [currentCourseKey, setCurrentCourseKey] = useState(null);
 
+  const [user, setUser] = useAuthState();
 
 
 
@@ -193,6 +195,9 @@ const App = () => {
         <div> 
           <div className="header">
             <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+            {user ? ( <button className="float-right" onClick={firebaseSignOut}>Sign Out</button>) 
+                  : ( <button className="float-right" onClick={signInWithGoogle}>Sign In with Google</button> )}
+
             <button className="float-right" onClick={() => setShowModal(true)}>Course Plan</button>
           </div>
   
@@ -213,15 +218,18 @@ const App = () => {
                     <h5 className="card-title">{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
                     <div className="card-text">{schedule.courses[key].title}</div>
                     <div className="card-text">{schedule.courses[key].meets}</div>
-                    <button 
-                      className="edit-button" 
-                      onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentCourseKey(key);
-                      setEditMode(true);
-                    }}>
-                      Edit
-                    </button>
+                    {user && (
+                        <button 
+                            className="edit-button" 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentCourseKey(key);
+                                setEditMode(true);
+                            }}
+                        >
+                            Edit
+                        </button>
+                    )}
                   </div>
                 )
               })}
