@@ -98,7 +98,7 @@ const App = () => {
   const [editMode, setEditMode] = useState(false); 
   const [currentCourseKey, setCurrentCourseKey] = useState(null);
 
-  const [user, setUser] = useAuthState();
+  const [user, isAdmin] = useAuthState();
 
 
 
@@ -182,7 +182,9 @@ const App = () => {
   
   return (
     <>
-      <h1>{schedule.title}</h1>
+      <div className="title-container">
+        <h1>{schedule.title}</h1>
+      </div>
       {editMode ? (
         <CourseEditForm 
           course={schedule.courses[currentCourseKey]} 
@@ -194,7 +196,9 @@ const App = () => {
       ) : (
         <div> 
           <div className="header">
-            <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+            <div className="centered-term-selector">
+              <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+            </div>
             {user ? ( <button className="float-right" onClick={firebaseSignOut}>Sign Out</button>) 
                   : ( <button className="float-right" onClick={signInWithGoogle}>Sign In with Google</button> )}
 
@@ -218,7 +222,7 @@ const App = () => {
                     <h5 className="card-title">{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
                     <div className="card-text">{schedule.courses[key].title}</div>
                     <div className="card-text">{schedule.courses[key].meets}</div>
-                    {user && (
+                    {user && isAdmin && (
                         <button 
                             className="edit-button" 
                             onClick={(e) => {

@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase } from "firebase/database"; // Import for Realtime Database
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 
 // Your web app's Firebase configuration
@@ -21,3 +22,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const db = getDatabase(app);
+
+export const auth = getAuth();
+
+export const signInWithGoogle = () => {
+  signInWithPopup(getAuth(), new GoogleAuthProvider());
+};
+
+export const firebaseSignOut = () => {
+  signOut(getAuth());
+};

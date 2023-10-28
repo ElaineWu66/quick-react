@@ -115,3 +115,29 @@ button {
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+.header {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  flex-wrap: wrap; 
+}
+.centered-term-selector {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+.title-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+}
+
+.title-container h1 {
+  font-family: 'Dancing Script', cursive; 
+  font-size: 2.5rem; 
+  font-weight: normal;
+  color: #4E2A84; 
+  margin: 0; 
+  padding: 20px 0;
+}
