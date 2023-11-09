@@ -2,17 +2,20 @@ import { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import { useJsonQuery } from "./utilities/fetch";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { doCoursesConflict } from "./utilities/courseUtilities";
-import { validateTitle, validateMeets } from "./utilities/validation";
+import { useJsonQuery } from './utilities/fetch';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { doCoursesConflict } from './utilities/courseUtilities';
+import { validateTitle, validateMeets } from './utilities/validation';
 import React from 'react';
 import useFirebaseQuery from './hooks/useFirebaseQuery';
 import { set, ref } from 'firebase/database';
-import {db} from './utilities/firebase'; 
+import { db } from './utilities/firebase';
 
 import { useAuthState } from './hooks/useAuth';
 import { signInWithGoogle, firebaseSignOut } from './utilities/firebase';
+
+import Banner from './components/Banner';
+import CourseList from './components/CourseList';
 
 // const schedule = {
 //   "title": "CS Courses for 2018-2019",
@@ -44,18 +47,16 @@ import { signInWithGoogle, firebaseSignOut } from './utilities/firebase';
 //   }
 // };
 
-
 const TermSelector = ({ selectedTerm, setSelectedTerm }) => {
-  const terms = ["Fall", "Winter", "Spring"];
+  const terms = ['Fall', 'Winter', 'Spring'];
 
   return (
     <div className="term-selector">
-      {terms.map(term => (
-        <button 
-          key={term} 
+      {terms.map((term) => (
+        <button
+          key={term}
           onClick={() => setSelectedTerm(term)}
-          className={selectedTerm === term ? "active" : ""}
-        >
+          className={selectedTerm === term ? 'active' : ''}>
           {term}
         </button>
       ))}
@@ -65,13 +66,14 @@ const TermSelector = ({ selectedTerm, setSelectedTerm }) => {
 
 const Modal = ({ selectedCourses, courses, onClose }) => (
   <div className="modal-backdrop" onClick={onClose}>
-    <div className="modal-content" onClick={e => e.stopPropagation()}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
       {selectedCourses.length === 0 ? (
         <p>No courses selected. Click on a course to select it.</p>
       ) : (
-        selectedCourses.map(key => (
+        selectedCourses.map((key) => (
           <div key={key}>
-            CS {courses[key].number}: {courses[key].title} - {courses[key].meets}
+            CS {courses[key].number}: {courses[key].title} -{' '}
+            {courses[key].meets}
           </div>
         ))
       )}
@@ -80,10 +82,6 @@ const Modal = ({ selectedCourses, courses, onClose }) => (
   </div>
 );
 
-
-
-
-
 const App = () => {
   // const [data, isLoading, error] = useJsonQuery(
   //   "https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php"
@@ -91,25 +89,27 @@ const App = () => {
 
   const [data, isLoading, error] = useFirebaseQuery('/');
 
-  const [selectedTerm, setSelectedTerm] = useState("Fall");
+  const [selectedTerm, setSelectedTerm] = useState('Fall');
   const [selectedCourses, setSelectedCourses] = useState([]);
-  const [showModal, setShowModal] = useState(false); 
+  const [showModal, setShowModal] = useState(false);
 
-  const [editMode, setEditMode] = useState(false); 
+  const [editMode, setEditMode] = useState(false);
   const [currentCourseKey, setCurrentCourseKey] = useState(null);
 
   const [user, isAdmin] = useAuthState();
 
-
-
   const isCourseConflicting = (courseKey) => {
     const course = schedule.courses[courseKey];
-    return selectedCourses.some(selectedKey => doCoursesConflict(course, schedule.courses[selectedKey]));
+    return selectedCourses.some((selectedKey) =>
+      doCoursesConflict(course, schedule.courses[selectedKey])
+    );
   };
 
   const toggleCourseSelection = (key) => {
     if (selectedCourses.includes(key)) {
-      setSelectedCourses(selectedCourses.filter(courseKey => courseKey !== key));
+      setSelectedCourses(
+        selectedCourses.filter((courseKey) => courseKey !== key)
+      );
     } else if (!isCourseConflicting(key)) {
       setSelectedCourses([...selectedCourses, key]);
     }
@@ -123,7 +123,7 @@ const App = () => {
   const CourseEditForm = ({ course, onCancel }) => {
     const [title, setTitle] = useState(course.title);
     const [meets, setMeets] = useState(course.meets);
-  
+
     const [errors, setErrors] = useState({});
 
     const onSubmit = (e) => {
@@ -132,11 +132,11 @@ const App = () => {
 
       const titleError = validateTitle(title);
       const meetsError = validateMeets(meets);
-  
+
       if (titleError || meetsError) {
         setErrors({
           title: titleError,
-          meets: meetsError
+          meets: meetsError,
         });
         return;
       }
@@ -145,111 +145,101 @@ const App = () => {
         setEditMode(false);
         setCurrentCourseKey(null);
       }
-
-
     };
-  
+
     return (
       <form onSubmit={onSubmit}>
         <div>
           <label>Title:</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
           {errors.title && <div className="error">{errors.title}</div>}
         </div>
         <div>
           <label>Meets:</label>
-          <input type="text" value={meets} onChange={(e) => setMeets(e.target.value)} />
-                  {errors.meets && <div className="error">{errors.meets}</div>}
-
+          <input
+            type="text"
+            value={meets}
+            onChange={(e) => setMeets(e.target.value)}
+          />
+          {errors.meets && <div className="error">{errors.meets}</div>}
         </div>
-        <button type="button" onClick={onCancel}>Cancel</button>
-        <button type="submit">Submit</button>   
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit">Submit</button>
       </form>
     );
   };
 
-
-
   if (error) return <h1>Error loading Schedule data: {`${error}`}</h1>;
   if (isLoading) return <h1>Loading Schedule data...</h1>;
   if (!data) return <h1>No Schedule data found</h1>;
-  
+
   // console.log(data)
   const schedule = data;
 
-
-
-  
   return (
     <>
-      <div className="title-container">
-        <h1>{schedule.title}</h1>
-      </div>
+      <Banner title={schedule.title} />
       {editMode ? (
-        <CourseEditForm 
-          course={schedule.courses[currentCourseKey]} 
+        <CourseEditForm
+          course={schedule.courses[currentCourseKey]}
           onCancel={() => {
             setEditMode(false);
             setCurrentCourseKey(null);
-          }} 
+          }}
         />
       ) : (
-        <div> 
+        <div>
           <div className="header">
             <div className="centered-term-selector">
-              <TermSelector selectedTerm={selectedTerm} setSelectedTerm={setSelectedTerm} />
+              <TermSelector
+                selectedTerm={selectedTerm}
+                setSelectedTerm={setSelectedTerm}
+              />
             </div>
-            {user ? ( <button className="float-right" onClick={firebaseSignOut}>Sign Out</button>) 
-                  : ( <button className="float-right" onClick={signInWithGoogle}>Sign In with Google</button> )}
+            {user ? (
+              <button className="float-right" onClick={firebaseSignOut}>
+                Sign Out
+              </button>
+            ) : (
+              <button className="float-right" onClick={signInWithGoogle}>
+                Sign In with Google
+              </button>
+            )}
 
-            <button className="float-right" onClick={() => setShowModal(true)}>Course Plan</button>
+            <button className="float-right" onClick={() => setShowModal(true)}>
+              Course Plan
+            </button>
           </div>
-  
-          {showModal && <Modal selectedCourses={selectedCourses} courses={schedule.courses} onClose={() => setShowModal(false)} />}
-  
-          <div className="courses-grid">
-            {Object.keys(schedule.courses)
-              .filter(key => schedule.courses[key].term === selectedTerm)
-              .map(key => {
-                const isSelected = selectedCourses.includes(key);
-                const isConflicting = !isSelected && isCourseConflicting(key);
-                return (
-                  <div 
-                    className={`card m-1 p-2 ${isSelected ? 'selected-course' : ''} ${isConflicting ? 'conflicting-course' : ''}`} 
-                    key={key}
-                    onClick={() => toggleCourseSelection(key)}
-                  >
-                    <h5 className="card-title">{schedule.courses[key].term} CS {schedule.courses[key].number}</h5>
-                    <div className="card-text">{schedule.courses[key].title}</div>
-                    <div className="card-text">{schedule.courses[key].meets}</div>
-                    {user && isAdmin && (
-                        <button 
-                            className="edit-button" 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setCurrentCourseKey(key);
-                                setEditMode(true);
-                            }}
-                        >
-                            Edit
-                        </button>
-                    )}
-                  </div>
-                )
-              })}
-          </div>
+
+          {showModal && (
+            <Modal
+              selectedCourses={selectedCourses}
+              courses={schedule.courses}
+              onClose={() => setShowModal(false)}
+            />
+          )}
+
+          <CourseList
+            courses={schedule.courses}
+            selectedTerm={selectedTerm}
+            selectedCourses={selectedCourses}
+            toggleCourseSelection={toggleCourseSelection}
+            user={user}
+            isAdmin={isAdmin}
+            setCurrentCourseKey={setCurrentCourseKey}
+            setEditMode={setEditMode}
+          />
         </div>
       )}
     </>
-  )
-  
+  );
 };
-
-
-
-
-
-
 
 const queryClient = new QueryClient();
 function AppWrapper() {
